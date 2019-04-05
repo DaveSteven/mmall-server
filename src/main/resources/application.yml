@@ -8,7 +8,7 @@ spring:
     username: root
     password: 59ea27d2
     url: jdbc:mysql://localhost:3306/mmall?useSSL=false
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

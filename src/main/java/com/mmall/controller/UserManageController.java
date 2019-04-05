@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/manage/user")
 public class UserManageController {
 
-    @Autowired
+    @Resource
     private IUserService iUserService;
 
     /**
@@ -27,8 +28,7 @@ public class UserManageController {
      * @param session
      * @return
      */
-    @PostMapping(value = "login")
-
+    @PostMapping("login")
     public ServerResponse<User> login(String username, String password, HttpSession session) {
         ServerResponse<User> response = iUserService.login(username, password);
         if (response.isSuccess()) {

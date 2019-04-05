@@ -1,9 +1,11 @@
 package com.mmall.controller;
 
+import com.mmall.annotation.LoginRequired;
 import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.data.entity.User;
+import com.mmall.holder.UserHolder;
 import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.RegEx;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/manage/category")
 public class CategoryManageController {
 
-    @Autowired
+    @Resource
     private IUserService iUserService;
 
-    @Autowired
+    @Resource
     private ICategoryService iCategoryService;
 
     /**
@@ -34,8 +37,7 @@ public class CategoryManageController {
      * @param parentId
      * @return
      */
-    @PostMapping("add_category")
-
+    @PostMapping("addCategory")
     public ServerResponse addCategory(HttpSession session, String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
@@ -56,14 +58,10 @@ public class CategoryManageController {
      * @param categoryName
      * @return
      */
-    @PostMapping("set_category_name")
-
+    @LoginRequired
+    @PostMapping("setCategoryName")
     public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
-        }
-        if (iUserService.checkAdminRole(user).isSuccess()) {
+        if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
             return iCategoryService.setCategoryName(categoryName, categoryId);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");

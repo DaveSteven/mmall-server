@@ -2,7 +2,6 @@ package com.mmall.controller;
 
 import com.mmall.annotation.LoginRequired;
 import com.mmall.common.Const;
-import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.data.entity.User;
 import com.mmall.holder.UserHolder;
@@ -75,7 +74,6 @@ public class UserController {
     /**
      * 获取用户信息
      *
-     * @param session
      * @return
      */
     @LoginRequired
@@ -124,14 +122,13 @@ public class UserController {
     /**
      * 修改密码
      *
-     * @param session
      * @param passwordOld
      * @param passwordNew
      * @return
      */
     @LoginRequired
     @PostMapping("resetPassword")
-    public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
+    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew) {
         return iUserService.resetPassword(passwordOld, passwordNew, UserHolder.get());
     }
 
