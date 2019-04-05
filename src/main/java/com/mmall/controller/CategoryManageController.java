@@ -32,18 +32,14 @@ public class CategoryManageController {
     /**
      * 添加分类
      *
-     * @param session
      * @param categoryName
      * @param parentId
      * @return
      */
+    @LoginRequired
     @PostMapping("addCategory")
-    public ServerResponse addCategory(HttpSession session, String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录");
-        }
-        if (iUserService.checkAdminRole(user).isSuccess()) {
+    public ServerResponse addCategory(String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
+        if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
             return iCategoryService.addCategory(categoryName, parentId);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
@@ -53,14 +49,13 @@ public class CategoryManageController {
     /**
      * 更新分类
      *
-     * @param session
      * @param categoryId
      * @param categoryName
      * @return
      */
     @LoginRequired
     @PostMapping("setCategoryName")
-    public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
+    public ServerResponse setCategoryName(Integer categoryId, String categoryName) {
         if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
             return iCategoryService.setCategoryName(categoryName, categoryId);
         } else {
