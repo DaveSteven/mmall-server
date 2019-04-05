@@ -7,9 +7,12 @@ import com.mmall.service.ICategoryService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service("iCategoryService")
 public class CategoryServiceImpl implements ICategoryService {
 
+    @Resource
     private CategoryMapper categoryMapper;
 
     /**

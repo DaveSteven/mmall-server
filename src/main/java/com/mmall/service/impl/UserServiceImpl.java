@@ -8,20 +8,23 @@ import com.mmall.data.entity.User;
 import com.mmall.service.IUserService;
 import com.mmall.util.MD5Util;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 
 @Service("iUserService")
 public class UserServiceImpl implements IUserService {
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Override
     /**
      * 登录
+     *
+     * @param username
+     * @param password
+     * @return
      */
     public ServerResponse<User> login(String username, String password) {
         int resultCount = userMapper.checkUsername(username);
@@ -46,11 +49,11 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     public ServerResponse<String> register(User user) {
-        ServerResponse validResponse = this.checkValid(user.getUsername(), Const.USRENAME);
+        ServerResponse validResponse = this.checkUsernameOrEmail(user.getUsername(), Const.USRENAME);
         if (!validResponse.isSuccess()) {
             return validResponse;
         }
-        validResponse = this.checkValid(user.getEmail(), Const.EMAIL);
+        validResponse = this.checkUsernameOrEmail(user.getEmail(), Const.EMAIL);
         if (!validResponse.isSuccess()) {
             return validResponse;
         }
@@ -74,7 +77,7 @@ public class UserServiceImpl implements IUserService {
      * @param type
      * @return
      */
-    public ServerResponse<String> checkValid(String str, String type) {
+    public ServerResponse<String> checkUsernameOrEmail(String str, String type) {
         if (StringUtils.isNotBlank(type)) {
             if (Const.USRENAME.equals(type)) {
                 int resultCount = userMapper.checkUsername(str);
@@ -102,7 +105,7 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     public ServerResponse<String> selectQuestion(String username) {
-        ServerResponse validResponse = this.checkValid(username, Const.USRENAME);
+        ServerResponse validResponse = this.checkUsernameOrEmail(username, Const.USRENAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
@@ -139,11 +142,11 @@ public class UserServiceImpl implements IUserService {
      * @param forgetToken
      * @return
      */
-    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+    public ServerResponse<String> resetPasswordInForget(String username, String passwordNew, String forgetToken) {
         if (StringUtils.isBlank(forgetToken)) {
             return ServerResponse.createByErrorMessage("参数错误，获取不到token");
         }
-        ServerResponse validResponse = this.checkValid(username, Const.USRENAME);
+        ServerResponse validResponse = this.checkUsernameOrEmail(username, Const.USRENAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
