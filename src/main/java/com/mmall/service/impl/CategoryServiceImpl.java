@@ -4,11 +4,15 @@ import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.data.entity.Category;
 import com.mmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
+@Slf4j
 @Service("iCategoryService")
 public class CategoryServiceImpl implements ICategoryService {
 
@@ -45,9 +49,9 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId
      * @return
      */
-    public ServerResponse setCategoryName(String categoryName, Integer categoryId) {
-        if (StringUtils.isBlank(categoryName)) {
-            return ServerResponse.createByErrorMessage("需要填写分类名称");
+    public ServerResponse updateCategoryName(Integer categoryId, String categoryName) {
+        if (null == categoryId || StringUtils.isBlank(categoryName)) {
+            return ServerResponse.createByErrorMessage("分类名或分类ID为空");
         }
         Category category = new Category();
         category.setId(categoryId);
@@ -58,5 +62,13 @@ public class CategoryServiceImpl implements ICategoryService {
             return ServerResponse.createBySuccessMessage("品类更新成功");
         }
         return ServerResponse.createByErrorMessage("品类更新失败");
+    }
+
+    public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
+        List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
+        if (CollectionUtils.isEmpty(categoryList)) {
+            log.info("未找到当前分类的子分类");
+        }
+        return ServerResponse.createBySuccess(categoryList);
     }
 }

@@ -1,23 +1,18 @@
 package com.mmall.controller;
 
 import com.mmall.annotation.LoginRequired;
-import com.mmall.common.Const;
-import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
-import com.mmall.data.entity.User;
 import com.mmall.holder.UserHolder;
 import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.RegEx;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/manage/category")
@@ -38,7 +33,7 @@ public class CategoryManageController {
      */
     @LoginRequired
     @PostMapping("addCategory")
-    public ServerResponse addCategory(String categoryName, @RequestParam(value = "parentId", defaultValue = "0") int parentId) {
+    public ServerResponse addCategory(String categoryName, @RequestParam(value = "parentId", defaultValue = "0") Integer parentId) {
         if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
             return iCategoryService.addCategory(categoryName, parentId);
         } else {
@@ -57,9 +52,26 @@ public class CategoryManageController {
     @PostMapping("setCategoryName")
     public ServerResponse setCategoryName(Integer categoryId, String categoryName) {
         if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
-            return iCategoryService.setCategoryName(categoryName, categoryId);
+            return iCategoryService.updateCategoryName(categoryId, categoryName);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
+
+    /**
+     * 获取分类
+     *
+     * @param categoryId
+     * @return
+     */
+    @LoginRequired
+    @GetMapping("getCategory")
+    public ServerResponse getChildrenParallelCategory(@RequestParam(value = "categoryId", defaultValue = "0") Integer categoryId) {
+        if (iUserService.checkAdminRole(UserHolder.get()).isSuccess()) {
+            // 查询子节点的category信息，并且不递归，保持平级
+            return iCategoryService.getChildrenParallelCategory(categoryId);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作，需要管理员权限");
         }
     }
 }

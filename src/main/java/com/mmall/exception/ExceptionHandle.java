@@ -14,10 +14,7 @@ public class ExceptionHandle {
     public ServerResponse handle(Exception e) {
         if (e instanceof MyException) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "未登录");
-        } else if (e instanceof PermissionException) {
-            return ServerResponse.createByErrorMessage("无权限");
-        } else {
-            return ServerResponse.createByError();
         }
+        return ServerResponse.createByError();
     }
 }
